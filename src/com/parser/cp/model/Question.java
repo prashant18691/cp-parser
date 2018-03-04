@@ -4,6 +4,10 @@ public class Question {
     private String input;
     private String output;
 
+    public Question() {
+
+    }
+
     public Question(String input, String output) {
         this.input = input;
         this.output = output;

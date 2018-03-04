@@ -1,7 +1,14 @@
 package com.parser.cp;
 
+import com.intellij.notification.Notification;
+import com.intellij.notification.NotificationType;
+import com.intellij.notification.Notifications;
+import com.intellij.openapi.application.TransactionGuard;
 import com.intellij.openapi.components.ProjectComponent;
 import com.intellij.openapi.project.Project;
+import com.parser.cp.exception.ImpartialException;
+import com.parser.cp.impl.HackerRankDomParserImpl;
+import com.parser.cp.model.Task;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.BufferedReader;
@@ -11,6 +18,8 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class MyProjectComponent implements ProjectComponent {
     private static final Logger LOGGER = Logger.getLogger(MyProjectComponent.class.getSimpleName());
@@ -34,14 +43,23 @@ public class MyProjectComponent implements ProjectComponent {
                         return;
                     try {
                         Socket socket = serverSocket.accept();
-                        BufferedReader reader = new BufferedReader(
+                        BufferedReader bufferedReader = new BufferedReader(
                                 new InputStreamReader(socket.getInputStream(), "UTF-8"));
+                        final String type = bufferedReader.readLine();
                         StringBuilder builder = new StringBuilder();
                         String s;
-                        while ((s = reader.readLine()) != null)
+                        while ((s = bufferedReader.readLine()) != null)
                             builder.append(s).append('\n');
-                        final String page = builder.toString();
-                        LOGGER.info(page);
+                        final String page = embedHTML(builder.toString());
+                        /*What is this used for ?*/
+                        TransactionGuard.getInstance().submitTransactionAndWait(() -> {
+                            DomParser domParser = new HackerRankDomParserImpl();
+                            try {
+                                Task task = domParser.parse(page);
+                            } catch (ImpartialException e) {
+                                LOGGER.severe("Error occurred during parsing : " + e.getLocalizedMessage());
+                            }
+                        });
                     } catch (IOException e) {
                         LOGGER.log(Level.SEVERE, "Error occurred during socket acceptance ", e);
                         return;
@@ -72,5 +90,9 @@ public class MyProjectComponent implements ProjectComponent {
     @Override
     public String getComponentName() {
         return "Whatever";
+    }
+
+    private String embedHTML(String innerHTML) {
+        return "<html><body>" + innerHTML + "</body></html>";
     }
 }

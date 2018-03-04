@@ -1,20 +1,32 @@
 package com.parser.cp.model;
 
+import org.jetbrains.annotations.NotNull;
+
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 public class Task {
-    private Map<Integer, List<Question>> questionList;
+    private List<Question> questions;
 
-    public Task(Map<Integer, List<Question>> questionList) {
-        this.questionList = questionList;
+    public Task() {
+
     }
 
-    public Map<Integer, List<Question>> getQuestionList() {
-        return questionList;
+    public Task(List<Question> questions) {
+        this.questions = questions;
     }
 
-    public void setQuestionList(Map<Integer, List<Question>> questionList) {
-        this.questionList = questionList;
+    public List<Question> getQuestions() {
+        return questions;
+    }
+
+    public void setQuestions(List<Question> questions) {
+        this.questions = questions;
+    }
+
+    public void addQuestions(@NotNull Question question) {
+        if (questions == null) questions = new LinkedList<>();
+        questions.add(question);
     }
 }
