@@ -1,11 +1,9 @@
 package com.parser.cp;
 
-import com.intellij.notification.Notification;
-import com.intellij.notification.NotificationType;
-import com.intellij.notification.Notifications;
 import com.intellij.openapi.application.TransactionGuard;
 import com.intellij.openapi.components.ProjectComponent;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.project.ProjectManager;
 import com.parser.cp.exception.ImpartialException;
 import com.parser.cp.impl.HackerRankDomParserImpl;
 import com.parser.cp.model.Task;
@@ -18,8 +16,6 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 public class MyProjectComponent implements ProjectComponent {
     private static final Logger LOGGER = Logger.getLogger(MyProjectComponent.class.getSimpleName());
@@ -55,7 +51,11 @@ public class MyProjectComponent implements ProjectComponent {
                         TransactionGuard.getInstance().submitTransactionAndWait(() -> {
                             DomParser domParser = new HackerRankDomParserImpl();
                             try {
+                                /*OK I have the task*/
                                 Task task = domParser.parse(page);
+                                /*Is the project java-cp*/
+                                Project p = ProjectManager.getInstance().getOpenProjects()[0];
+                                LOGGER.info("Whatever");
                             } catch (ImpartialException e) {
                                 LOGGER.severe("Error occurred during parsing : " + e.getLocalizedMessage());
                             }
