@@ -4,6 +4,7 @@ import com.parser.cp.DomParser;
 import com.parser.cp.exception.ImpartialException;
 import com.parser.cp.model.Question;
 import com.parser.cp.model.Task;
+import com.parser.cp.util.Common;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
@@ -12,7 +13,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 public class HackerRankDomParserImpl implements DomParser {
     private static final Logger LOGGER = Logger.getLogger(HackerRankDomParserImpl.class.getSimpleName());
@@ -39,14 +39,14 @@ public class HackerRankDomParserImpl implements DomParser {
         Question question = new Question();
         Document document = Jsoup.parse(domAsString);
 
-        Optional<Elements> inputElement = getInputElement(document);
+        Optional<Elements> inputElement = Common.getElement(document, INPUT_SELECTORS);
         if (inputElement.isPresent()) {
             question.setInput(inputElement.get().text());
         } else {
             throw new ImpartialException("Sample input was unidentified.");
         }
 
-        Optional<Elements> outputElement = getOutputElement(document);
+        Optional<Elements> outputElement = Common.getElement(document, OUTPUT_SELECTORS);
         if (outputElement.isPresent()) {
             question.setOutput(outputElement.get().text());
         } else {
@@ -54,22 +54,6 @@ public class HackerRankDomParserImpl implements DomParser {
         }
         task.addQuestions(question);
         return task;
-    }
-
-    private static Optional<Elements> getInputElement(Document document) {
-        for (String filter : INPUT_SELECTORS) {
-            Elements element = document.select(filter);
-            return Optional.of(element);
-        }
-        return Optional.empty();
-    }
-
-    private static Optional<Elements> getOutputElement(Document document) {
-        for (String filter : OUTPUT_SELECTORS) {
-            Elements element = document.select(filter);
-            return Optional.of(element);
-        }
-        return Optional.empty();
     }
 
     public Document getDocument() {
