@@ -12,8 +12,5 @@ public class MyPreLoadingActivity extends PreloadingActivity {
     @Override
     public void preload(@NotNull ProgressIndicator progressIndicator) {
         LOGGER.info("Pre-loading plugin-data / parsing DOM");
-        /*Stash existing changes*/
-
-
     }
 }
